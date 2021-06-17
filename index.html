@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>鯖江のまち</title>
+<meta property="og:image" content="http://fukuno.jig.jp/2014/sabaenuclear.jpg">
+<link rel="apple-touch-icon" href="http://fukuno.jig.jp/2014/icon-exit.png"/>
+<link rel='stylesheet' href='https://code4sabae.github.io/leaflet-mjs/leaflet.css'/>
+<meta name="format-detection" content="telephone=no">
+<script type="module">
+import L from 'https://code4sabae.github.io/leaflet-mjs/leaflet.mjs'
+import { Geo3x3 } from "https://geo3x3.com/Geo3x3.js";
+import { TownID } from "https://code4fukui.github.io/TownID/TownID.js";
+
+const pref = "福井県";
+const city = "鯖江市";
+
+onload = async () => {
+  const map = L.map("mapid");
+  // set 国土地理院地図 https://maps.gsi.go.jp/development/ichiran.html
+  L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png", {
+		attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>"',
+		maxZoom: 18,
+  }).addTo(map);
+
+	const iconlayer = L.layerGroup();
+  iconlayer.addTo(map);
+  const lls = [];
+	const towns = await TownID.getTowns(pref, city);
+	console.log(towns);
+	const icon = L.icon({
+    iconUrl: "icon/icon-home2.png",
+    iconRetinaUrl: "icon/icon-home2.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+	});
+	for (const town of towns) {
+		const geo3x3 = await TownID.find(pref, city, town);
+		const pos = Geo3x3.decode(geo3x3);
+		const ll = [pos.lat, pos.lng];
+    const marker = L.marker(ll, { title: town, icon })
+		marker.bindPopup(town + " " + geo3x3);
+    iconlayer.addLayer(marker);
+    lls.push(ll);
+	}
+  if (lls.length) {
+    map.fitBounds(lls);
+	}
+};
+</script>
+<style>
+body {
+	margin: 0px;
+	text-align: center;
+	box-sizing: border-box; /* width include border */
+	-webkit-text-size-adjust: none; /* for iPhone */
+}
+#mapid {
+	width: 100%;
+	height: 60vh;
+}
+#credit a {
+	color: gray !important;
+	text-decoration: none;
+}
+#credit {
+	margin-top: 1em;
+	font-size: 80%;
+}
+</style>
+</head>
+<body>
+
+<h1>鯖江のまち</h1>
+<div id="mapid"></div>
+
+<div id="credit">
+DATA: CC BY <a href=https://github.com/code4fukui/TownID/>TownID by Code for Fukui</a><br>
+APP: CC BY <a href=http://fukuno.jig.jp/3249>福野泰介 一日一創</a><br>
+</div>
+
+</body>
+</html>
