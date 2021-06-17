@@ -23,10 +23,11 @@ onload = async () => {
   const lls = [];
 	const towns = await TownID.getTowns(pref, city);
 	console.log(towns);
+	const iconfn = "https://code4sabae.github.io/towns/icon/icon-home2.png";
 	const icon = L.icon({
-    iconUrl: "icon/icon-home2.png",
-    iconRetinaUrl: "icon/icon-home2.png",
-    iconSize: [32, 32],
+    iconUrl: iconfn,
+		iconRetinaUrl: iconfn,
+		iconSize: [32, 32],
     iconAnchor: [16, 16],
     popupAnchor: [0, -16],
 	});
